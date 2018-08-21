@@ -57,8 +57,8 @@ def generate_report(df_cna):
     df_cnaC['deep_amp'] = df_cna[df_cna.iloc[:,:] == 2].count(axis=1)
     df_cnaC['hetero_del'] = df_cna[df_cna.iloc[:,:] == -1].count(axis=1)
     df_cnaC['deep_del'] = df_cna[df_cna.iloc[:,:] == -2].count(axis=1)
-    df_cnaC['amp_total'] = df_cnaC['sum_1'] + df_cnaC['deep_amp']
-    df_cnaC['del_total'] = df_cnaC['sum_-1'] + df_cnaC['deep_del']
+    df_cnaC['amp_total'] = df_cnaC['Hetero_amp'] + df_cnaC['deep_amp']
+    df_cnaC['del_total'] = df_cnaC['Hetero_del'] + df_cnaC['deep_del']
     return df_cnaC
 
 
@@ -97,44 +97,46 @@ def create_genelist(chrom_file):
     return input_file["gene_name"].tolist()
 
 
-def main(keyword="Breast"):
+def main(keyword="Prostate"):
     # step1: generate rbp_related CNA table
     # genelist1 = generate_genelist(chr_range)   # give a range, find the genelist
-    filename = "../chrom_gene_list/chr8_gene.csv"
-    simple_name = get_simple_name(filename)
-    genelist1 = create_genelist(filename)
 
-    total_sample_number = 0
-    for n in trim_cna_df(keyword, genelist1, simple_name):
-        total_sample_number += n  ## total sample number in all Breast patients
+    #for file in glob.glob("../chrom_pq_gene_list/*"):
+    for file in glob.glob("../chrom_gene_list/*"):
+        simple_name = get_simple_name(file)
+        genelist1 = create_genelist(file)
 
-    # step2: Count all the breast samples CNA
-    df_total = pd.DataFrame()
-    for i in save_report(keyword, simple_name):
-        if df_total.empty:
-            df_total = i
-        else:
-            df_total = df_total.add(i, fill_value=0)
-    df_total.drop_duplicates(inplace=True)
-    #
-    # step3: calculate frequency
-    print "total sample number:", total_sample_number
-    total_sample_number /= 100.00
-    df_freq = df_total.divide(total_sample_number)
-    #
-    # ranking the genename by original sequence
-    pos = pd.read_table(filename, sep="\t", index_col=0)
-    df_ordered = df_freq.merge(pos, how="left", left_index = True, right_on = "gene_name")
-    df_ordered["gene_middle"] = (df_ordered["start"] + df_ordered["end"])/2
-    # virma_center = df_ordered.loc["KIAA1429","Middle"]
-    # df_ordered["centered"] = df_ordered["Middle"] - virma_center
+        total_sample_number = 0
+        for n in trim_cna_df(keyword, genelist1, simple_name):
+            total_sample_number += n  ## total sample number in all Breast patients
 
-    # save the file
-    filepath_dir = os.path.join("..", keyword + "_temp", "reports")
-    filepath2 = os.path.join(filepath_dir, simple_name + ".xls" )
-    if not os.path.exists(filepath_dir):
-        os.makedirs(filepath_dir)
-    df_ordered.to_csv(filepath2, sep="\t")
+        # step2: Count all the breast samples CNA
+        df_total = pd.DataFrame()
+        for i in save_report(keyword, simple_name):
+            if df_total.empty:
+                df_total = i
+            else:
+                df_total = df_total.add(i, fill_value=0)
+        df_total.drop_duplicates(inplace=True)
+        #
+        # step3: calculate frequency
+        print "total sample number:", total_sample_number
+        total_sample_number /= 100.00
+        df_freq = df_total.divide(total_sample_number)
+        #
+        # ranking the genename by original sequence
+        pos = pd.read_table(file, sep="\t", index_col=0)
+        df_ordered = df_freq.merge(pos, how="left", left_index = True, right_on = "gene_name")
+        df_ordered["gene_middle"] = (df_ordered["start"] + df_ordered["end"])/2
+        # virma_center = df_ordered.loc["KIAA1429","Middle"]
+        # df_ordered["centered"] = df_ordered["Middle"] - virma_center
+
+        # save the file
+        filepath_dir = os.path.join("..", keyword + "_temp", "reports")
+        filepath2 = os.path.join(filepath_dir, simple_name + ".xls" )
+        if not os.path.exists(filepath_dir):
+            os.makedirs(filepath_dir)
+        df_ordered.to_csv(filepath2, sep="\t")
     pass
 
 
