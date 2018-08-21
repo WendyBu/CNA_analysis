@@ -58,7 +58,7 @@ def generate_report(df_cna):
     df_cnaC['hetero_del'] = df_cna[df_cna.iloc[:,:] == -1].count(axis=1)
     df_cnaC['deep_del'] = df_cna[df_cna.iloc[:,:] == -2].count(axis=1)
     df_cnaC['amp_total'] = df_cnaC['Hetero_amp'] + df_cnaC['deep_amp']
-    df_cnaC['del_total'] = df_cnaC['Hetero_del'] + df_cnaC['deep_del']
+    df_cnaC['del_total'] = df_cnaC['hetero_del'] + df_cnaC['deep_del']
     return df_cnaC
 
 
@@ -155,11 +155,12 @@ def main(keyword="Prostate"):
 # Thyroid 1610
 # Uterine 1426
 
-
-
+# keywordlist = ["Prostate","Breast", "Bladder", "Colon", "GBM"]
+keywordlist = ["Head&Neck", "Kidney", "Liver", "Lung", "Melanoma", "Ovarian", "Stomach", "Thyroid", "Uterine"]
 
 if __name__ == "__main__":
-    main()
+    for i in keywordlist:
+        main(i)
 
 
 ### myc location NC_000008.11 (127735434..127742951)
