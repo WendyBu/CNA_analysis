@@ -20,11 +20,12 @@ def order_table(df, chr):
 
 def clean_df(df):
     vlist = [-1, -2, 0, 1, 2]
-    test = df.iloc[3, :]  # randomly picked the third row
-    test_result = test[~test.isin(vlist)].index
-    df.drop(test_result, axis=1, inplace=True)
-    if ("chrom" in df.columns):
-        df.drop("chrom", axis=1, inplace=True)
+    if df.shape[0] > 3:
+        test = df.iloc[3, :]  # randomly picked the third row
+        test_result = test[~test.isin(vlist)].index
+        df.drop(test_result, axis=1, inplace=True)
+        if ("chrom" in df.columns):
+            df.drop("chrom", axis=1, inplace=True)
     return df
 
 
@@ -57,8 +58,8 @@ def main(keyword="Melanoma"):
     pass
 
 
-# keywordlist = ["Prostate","Breast", "Bladder", "Colon", "GBM"]
-keywordlist=["Prostate"]
+# keywordlist = ["Breast", "Bladder", "Colon", "GBM"]
+# keywordlist=["Prostate"]
 if __name__ == "__main__":
     for key in keywordlist:
         main(key)
